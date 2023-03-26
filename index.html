@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Monster Maker</title>
+	<script src="jquery-1.10.1.min.js"></script>
+	<script src="jquery-ui.min.js"></script>
+	<script src="jquery.ui.touch-punch.min.js"></script>
+	<script src="underscore-min.js"></script>
+	<style>
+		img {
+			margin:0;
+			padding:0;
+			position:relative;
+			outline:4px solid #876;
+			/*padding:4px;*/
+			
+			/*-webkit-transition: left 0.2s ease-in;*/
+
+			 -webkit-transition: all 0.2s ease-in-out;
+			  -moz-transition: all 0.2s ease-in-out;
+			  -o-transition: all 0.2s ease-in-out;
+			  transition: all 0.2s ease-in-out;
+		}
+		img.transitionoff {
+				 -webkit-transition: none;
+			  -moz-transition: none;
+			  -o-transition: none;
+			  transition: none;
+		}
+
+		img.active {
+			outline:none;
+			padding:0;
+			margin:0;
+
+		}
+		img:hover {
+			background:rgba(128,128,128,0.5);
+		}
+		img::before {
+			content:"name";
+			background:#fed;
+			height:20px;
+			/*display:block;*/
+		}
+		body {
+			background: #FEDCBA;
+		}
+		#pasteboard {
+			width:256px;
+			height:256px;
+			background:#FED;
+
+		}
+		button {
+			width:35px;
+			height:24px;
+			padding:2px;
+		}
+		input {
+			width:225px;
+			height:18px;
+			font-family: monospace;
+		}
+
+		#pieces.loading {
+			/*background:gray;*/
+			width:calc(100% - 300px);
+			position: absolute;
+			right:0;
+			top:0;
+		}
+		#pieces img {
+			width:64px;
+			height:64px;
+		}
+		#pieces img.x2 {
+			width:128px;
+			height:128px;
+		}
+		#code {
+			margin-top:10px;
+			width:256px;
+			background:#FED;
+			word-break:break-all;
+			font-family: monospace;
+			height:64px;
+		}
+		#instr {
+			width:256px;
+			background: #FED;
+		}
+	</style>
+</head>
+<body>
+	<div id="pasteboard">Loading...  </div>
+	<input id="frame1" name="frame1" maxlength="32"><label for="frame1"> 1</label><br>
+	<!-- <input id="frame2" name="frame2" maxlength="32"><button>copy</button><br> -->
+	<!-- <input id="frame3" name="frame3" maxlength="32"><button>copy</button><br> -->
+	<!-- <input id="frame4" name="frame4" maxlength="32"><button>copy</button><br> -->
+	<!-- UNFINISHED CODE CRUD </br> -->
+	<!-- <textarea id="code">&nbsp;</textarea> -->
+	<div id="instr">
+	<p>All Pieces Licensed: <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a></p>
+	<p>authors attributed in tooltips</p>
+	<p>yip.pe modified many of them to fit in monster maker.</p>
+	</div>
+
+<!-- ids are base64 letter pairs. First letter is category, second letter ID.  -->
+<!-- A: left arm -->
+<!-- a: right arm -->
+<!-- B: Big Body -->
+<!-- b: little Body -->
+<!-- E: Left ear -->
+<!-- e: Right ear -->
+<!-- F: left foot -->
+<!-- f: right foot -->
+
+<!-- A B - - E F G H : a b - - e f GH-->
+<!--  -->
+<!-- 0: Mouth -->
+<!-- 1: tail -->
+<!-- 2: Title -->
+<!-- 3: Hat -->
+<!-- 8: Pair of Eyes -->
+
+<!-- Each part placement is a fixed size 4 char code, ID X Y -->
+<div id="pieces" class="loading">
+<img id="20"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/CFAA___AAA_________H4A_HA4__H4_AA_H4_A4H4AA______HAA_A4H____________4A4_____________H4_H4_H4_A4H4HA_H4_AAAH4HAH____A__________HAA___.png">
+<img id="21"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/CFAA_____________A4HAHA_____HAAH__H4_A4H4HA_H___4HA4__AAAA____________________AAAA__AAAH___4_A4H4HA_H___4AA4_____A4A4HA_____________.png">
+<img id="22"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/CFAA_____A_______A4AAHA____A4HA_______H4H4_______H4H4H4_______H4H4____H4H4_______H4H4A4H4_H___H4H4_______A4HA____A4A4HA_____________.png">
+<img id="23"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/CFAA_____8______kkkkkn____8k8nk__________________nk__k8kkk__n8__8kk8n8_kk_n8__kkkkk_kn8_______kkk______nkk_______n8k8nk8______G2____.png">
+<img id="24"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/IFAA_________4_AAAA_oAAFotAH__FoF_______HA_______HAA9sAgEg____ttFo9v__________EgEA8_AH4_______4H4________o______tAoF________________.png">
+<img id="25"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/KFAAbbbbbZbbbbbbJAIB________H4IBbbDYbA4H4AAbbbbbbbYAYAYAAAbbJJBP____-3-4JLBIbbAAAAbbbbAAbbbbbbbZJJZbLZbJJ4H42SyW2_3-IBAJbbbbbbDZbbbb.png">
+<img id="26"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/IFAAbbbJJbbbbbbbJJJLJLbbbbbbLZJJJbLZbJZLZLJbLZbJJZLZbbbbbbbbbbbbbbbbbbbZLbbbbbbbbbbbbbbbbbbbLOJ20hkJhZbJJZLMbbbbbbbbJJJJbbbbbbJZbbbb.png">
+<img id="T7"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/GFAAbZJJJb7bbbbbbLZLJLJJLZbbLZJJJbLZbbZLZLbbbZbLJLJ5bbbbbLZbbbbbbbbbJbbbbbbJ5JJLbbbbLJZJZbLfbbZLZLbbbZbJJJLZbbLJJJZLZLJbbbbbbbLZbbbb.png">
+<img id="T8"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/EFAAkkkkkkkkkkkkAAAEABJLbbbJAAAAkkkkkkAAAAkkkkkAAAAAkkkkkkkkEgkAAJDYDYLAAkEgkkkkkkkkEgkAAAEgkAgAABAkEgkEAABIbbbbbJJBAAAAkkkkkkEkkkkk.png">
+<img id="T9"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/GFAAEkkkAAAAkkkkkkkkkkkkEAkkAAAAkkkkkkAAAAkkkkkAAAAAkkkkkkkkEgkAAAAAEgkAAkEgkkkkkkkkEgkAAAEgkAgAAkEkkkkkkkkkkkEAAEAExOBwGEwGkEAkkkkk.png">
+<img id="TA"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/KFAAbbbbbZbbbbbbJAIB________H4IBbbDIJA__IABJLbbbbbbJAbbbbbAALZDJ5_P5P5_JJbLZAAbYDAAAYDADbbbbbbbZJJZbLZbJJ2OxWy-3-3WyIBAJbbbbbbDZbbbb.png">
+<img id="TB"		class="title"	title="yip.pe	CC"                                  	data-url=""	src="yippe/IFAAbbbYAAADAAbAAAAAbbbbbbbbAAAAAbDYbAAAAAJbJJZDbbDAbbbbbbbbbbbbbbbbbbCQCJaLLbbbbbbZbbbbbbbbbbbYDYbbbbbbbDYDAQbbYAAAbDAYbbbbbbbbbbbb.png">
+<img id="DA"		class="leg"  	             	title="★ David Williams ★ @magic_bane	CC"        	data-url="https://twitter.com/magic_bane/status/522543394266943488"	src="yippe/GFAA222222222ASSSSSASSSSQQSSCQA2222222G2222222222222Qw22w4HCCSCQCSSSQw22AkCQiEwGw4HEEAw2w24H2GkA2222222wQUw2QCASSkUkkkkkUikkCikkA2G2.png">
+<img id="DB"		class="leg"  	             	title="★ David Williams ★ @magic_bane	CC"        	data-url="https://twitter.com/magic_bane/status/522543394266943489"	src="yippe/GFAA2w2AkkUQkkUikkkkkikSSAQC2GiCG2222222Akw24H2G2GAgg4HGwGgUCQkA22GCSSSQCQSQQ4HG22GC2222222222222w2222222ACQSSCCSSSSASSSSSA222222222.png">
+
+<img id="gd"		class="accessories"	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487301" 	src="accessories/grau_70.png">
+<img id="ge"		class="accessories"	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487302" 	src="accessories/grau_71.png">
+<img id="gf"		class="accessories"	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487303" 	src="accessories/grau_72.png">
+<img id="gg"		class="accessories"	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487304" 	src="accessories/grau_73.png">
+<img id="gK"		class="accessories"	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487282" 	src="accessories/grau_51.png">
+<img id="gl"		class="accessories"	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487309" 	src="accessories/grau_78.png">
+<img id="A0"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357343"      	src="arm/ebmm_43.png">
+<img id="a0"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357344"      	src="arm/ebmm_42.png">
+<img id="A1"		class="arm"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/GFAA_____6______SSSXSSS___SkSkUiUXi6__iUiS_________HA______AiUSkiUXUi6____SUA_________________________X6X6_______S6XSSSS______SSSS__.png">
+<img id="a1"		class="arm"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/GFAA__UiUi______kSiU6XS6iS6X__X6X6__________________iS____SkkUSiSiUkkkUX6_ik6_______________________________SkiUSSkS6iSk____________.png">
+<img id="A2"		class="arm"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAA____________ASCHQSSSSSSS4H4_______H4H___________H_____ASSSCSSSSSSSSSAHSSCA_____4_________4_ASSS_X6_H4HSSSSSSSSA4__Q4____________.png">
+<img id="a2"		class="arm"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAA____________ASCHQSSSSSSSSS4H4HSSSSSSA_H4________H_____ASSSCSSSSSSSCQ4HSSCA_____4________________________ASSSSSA___Q4____________.png">
+<img id="A3"		class="arm"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAAbbbbbbbbbbbYAAADACbbbbbSBIBbbbbbbbIBIZbbbbbbbbbbZbbbbbbbbbJCTabbbbbbbbbbbbbbbbbbAAbbABABAJAAAAAYDYbAAAAAbbbbbbbbAAQAAbDYbDAADbbb.png">
+<img id="a3"		class="arm"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAAbbbYAAADAAbAAAAAbbbbbbbbAAAAAbDYbAAAAAJbJJZDbbDAbbbbbbbbbbbbbbbbbbCQCJaLLbbbbbbZbbbbbbbbbbbYDYbbbbbbbDYDAQbbYAAAbDAYbbbbbbbbbbbb.png">
+<img id="A4"		class="arm"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAAbbbbLJbbbbbbJJJJbbbbbbbbLZLJJbLZJmMxOLxZbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbLJJJJJJLbbbbbbbbLJJJJbbbbbbJZLbbb.png">
+<img id="a4"		class="arm"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAAbbbZLJbbbbbbJJJJZbbbbbbbbZJJJJJLZbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbZLbbbbbbbbbbbbbbbbbbbLOJ20hkJhZbJJZLMbbbbbbbbJJJJbbbbbbJZbbbb.png">
+<img id="A5"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357333"      	src="arm/ebmm_36.png">
+<img id="a5"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357334"      	src="arm/ebmm_37.png">
+<img id="A6"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357335"      	src="arm/ebmm_38.png">
+<img id="a6"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357336"      	src="arm/ebmm_39.png">
+<img id="A7"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357337"      	src="arm/ebmm_60.png">
+<img id="a7"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357338"      	src="arm/ebmm_61.png">
+<img id="A8"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357339"      	src="arm/ebmm_44.png">
+<img id="a8"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357340"      	src="arm/ebmm_45.png">
+<img id="A9"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357341"      	src="arm/ebmm_23.png">
+<img id="a9"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357342"      	src="arm/ebmm_21.png">
+<img id="aA"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357345"      	src="arm/ebmm_46.png">
+<img id="AA"		class="arm"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357346"      	src="arm/ebmm_47.png">
+<img id="GA"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487232" 	src="arm/grau_01.png">
+<img id="GB"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487233" 	src="arm/grau_02.png">
+<img id="GC"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487234" 	src="arm/grau_03.png">
+<img id="GD"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487235" 	src="arm/grau_04.png">
+<img id="GE"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487236" 	src="arm/grau_05.png">
+<img id="Gi"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487266" 	src="arm/grau_35.png">
+<img id="Gj"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487267" 	src="arm/grau_36.png">
+<img id="Gk"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487268" 	src="arm/grau_37.png">
+<img id="Gl"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487269" 	src="arm/grau_38.png">
+<img id="gN"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487285" 	src="arm/grau_54.png">
+<img id="gO"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487286" 	src="arm/grau_55.png">
+<img id="GS"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487250" 	src="arm/grau_19.png">
+<img id="GT"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487251" 	src="arm/grau_20.png">
+<img id="GU"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487252" 	src="arm/grau_21.png">
+<img id="gU"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487292" 	src="arm/grau_61.png">
+<img id="GV"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487253" 	src="arm/grau_22.png">
+<img id="gZ"		class="arm"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487297" 	src="arm/grau_66.png">
+<img id="R0"		class="arm"        	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259712"	src="arm/RES_10.png">
+<img id="R1"		class="arm"        	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259713"	src="arm/RES_11.png">
+<img id="VA"		class="arm"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625472"       	src="arm/VM_33.png">
+<img id="VB"		class="arm"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625473"       	src="arm/VM_34.png">
+<img id="VC"		class="arm"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625474"       	src="arm/VM_37.png">
+<img id="VD"		class="arm"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625475"       	src="arm/VM_38.png">
+<img id="VE"		class="arm"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625476"       	src="arm/VM_73.png">
+<img id="VF"		class="arm"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625477"       	src="arm/VM_74.png">
+<img id="VG"		class="arm"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625478"       	src="arm/VM_75.png">
+<img id="VH"		class="arm"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625479"       	src="arm/VM_76.png">
+<img id="B1"		class="body"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/EFAA____________AAAHAAAAAAAA4H________H4H4_________HAA____AAAAAAAAAAAAAAAAAAAA____AA4_________H4H4________4HAAAAAAAA4AAA____________.png">
+<img id="B3"		class="body"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/GFAAfdbtdrtbrdbtrbdtbrbrrbbbrdbttbrdbttdrdtbrd7rdrrtbddrdrtrddbbdbbbbbdtrddrdtdrdrtrttdrdfrdbtttdrtbrdbtrbbrtdbbbbrbrdbttbrdbtdttbr7.png">
+<img id="B5"		class="body"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAAkkkkkkkkkkcbJJkkkkbbbbkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjbbbbbkkkkbbbbjcjcbbbbbbjkcjkkkkkkkkkkkkkkkkkkkkkkkkkbbbbbbkkJJJbbckkkkkkkkk.png">
+<img id="B7"		class="body"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/EFAA_____8___kkiSSikSSi0k0SSkkkk______kkkk____nkkkkkkkkkkkiSkUiSSS0kkmSSSUikSUkkkkkkkkkkk8____kkkk______kkkkSSmkmUSSkUSSUkk___n_____.png">
+<img id="B9"		class="body"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/GFAAtttoQUotFCASiUUSSiSUSiSUiSSiCFQCASUSUiSAQCASUSSSSiUSSSiUSUiUSUkSSiSSUSSUUiSSUSSUSSSSSAQCASSSSUSAQCoQSSUSSkiUSiSiiSUiSAQotFSCFttt.png">
+<img id="B2"		class="body x2"    	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/EGAA____________AAAHAAAAAAAA4H________H4H4_________HAA____AAAAAAAAAAAAAAAAAAAA____AA4_________H4H4________4HAAAAAAAA4AAA____________.png">
+<img id="B4"		class="body x2"    	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/GGAAfdbtdrtbrdbtrbdtbrbrrbbbrdbttbrdbttdrdtbrd7rdrrtbddrdrtrddbbdbbbbbdtrddrdtdrdrtrttdrdfrdbtttdrtbrdbtrbbrtdbbbbrbrdbttbrdbtdttbr7.png">
+<img id="B6"		class="body x2"    	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IGAAkkkkkkkkkkcbJJkkkkbbbbkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjbbbbbkkkkbbbbjcjcbbbbbbjkcjkkkkkkkkkkkkkkkkkkkkkkkkkbbbbbbkkJJJbbckkkkkkkkk.png">
+<img id="B8"		class="body x2"    	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/EGAA_____8___kkiSSikSSi0k0SSkkkk______kkkk____nkkkkkkkkkkkiSkUiSSS0kkmSSSUikSUkkkkkkkkkkk8____kkkk______kkkkSSmkmUSSkUSSUkk___n_____.png">
+<img id="BA"		class="body x2"    	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/GGAAtttoQUotFCASiUUSSiSUSiSUiSSiCFQCASUSUiSAQCASUSSSSiUSSSiUSUiUSUkSSiSSUSSUUiSSUSSUSSSSSAQCASSSSUSAQCoQSSUSSkiUSiSiiSUiSAQotFSCFttt.png">
+<img id="l0"		class="body x2"    	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856385"        	src="body/LRV-B_03.png">
+<img id="l1"		class="body x2"    	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856386"        	src="body/LRV-B_05.png">
+<img id="BB"		class="body"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357312"      	src="body/ebmm_03.png">
+<img id="BC"		class="body"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357313"      	src="body/ebmm_05.png">
+<img id="BD"		class="body"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357314"      	src="body/ebmm_07.png">
+<img id="BE"		class="body"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357315"      	src="body/ebmm_09.png">
+<img id="BF"		class="body"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357316"      	src="body/ebmm_11.png">
+<img id="BG"		class="body"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357317"      	src="body/ebmm_13.png">
+<img id="BH"		class="body"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357318"      	src="body/ebmm_15.png">
+<img id="BI"		class="body"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357319"      	src="body/ebmm_17.png">
+<img id="BJ"		class="body"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357320"      	src="body/ebmm_19.png">
+<img id="GW"		class="body"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487254" 	src="body/grau_23.png">
+<img id="GX"		class="body"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487255" 	src="body/grau_24.png">
+<img id="GY"		class="body"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487256" 	src="body/grau_25.png">
+<img id="GZ"		class="body"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487257" 	src="body/grau_26.png">
+<img id="l3"		class="body"       	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856388"        	src="body/LRV-H_04.png">
+<img id="l4"		class="body"       	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856389"        	src="body/LRV-H_05.png">
+<img id="l5"		class="body"       	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856390"        	src="body/LRV-H_07.png">
+<img id="l6"		class="body"       	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856391"        	src="body/LRV-H_08.png">
+<img id="l7"		class="body"       	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856392"        	src="body/LRV-H_09.png">
+<img id="PA"		class="body"       	title="PearIyNerfect                       	CC"	data-url="https://twitter.com/PearIyNerfect/status/521850595981135872" 	src="body/PN_06.png">
+<img id="R2"		class="body"       	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259714"	src="body/RES_04.png">
+<img id="R3"		class="body"       	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259715"	src="body/RES_05.png">
+<img id="SA"		class="body"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="body/SH_04.png">
+<img id="SB"		class="body"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="body/SH_26.png">
+<img id="VI"		class="body"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625480"       	src="body/VM_68.png">
+<img id="E1"		class="ear"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAA_____4___4_A222w222kAAwmkm2w4_wGA2Eg4H2Aw4_H___4_____________A___AbAH____________________4_ABIMgk2222m0Ejc4Ak022m022A_H4_A0GgE__.png">
+<img id="e1"		class="ear"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAA_AEgG0A_H4_A220m220kAAjcE0m2222gAJJJA_IA____________________Ab4___A___________________4wA24HAE2AAA4Aw2mkmwAAk2224w2GH_____H4____.png">
+<img id="E2"		class="ear"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAA_________PJLZL___4JKbbbZKH________P__________P__PK5P5PSbLJ__BSTabbbbbbbZbTJRKRbbbS5___PKabbbaSSSASLbbbTSbbbbSbTbLbbbZ5P___Z4P___.png">
+<img id="e2"		class="ear"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAA___5PL___5PLbbbZbbSbbbbbSabbbZSJSSSTbbbTR5___PSbbTKRKRbbaTbbbbbbbaTR5_RK5ZLZP________________5_________PKRbbR5___5RTbJJP________.png">
+<img id="gE"		class="ears"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487276" 	src="ears/grau_45.png">
+<img id="gF"		class="ears"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487277" 	src="ears/grau_46.png">
+<img id="PB"		class="ears"       	title="PearIyNerfect                       	CC"	data-url="https://twitter.com/PearIyNerfect/status/521850595981135873" 	src="ears/PN_12.png">
+<img id="PC"		class="ears"       	title="PearIyNerfect                       	CC"	data-url="https://twitter.com/PearIyNerfect/status/521850595981135874" 	src="ears/PN_14.png">
+<img id="SC"		class="ears"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="ears/SH_24.png">
+<img id="SD"		class="ears"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="ears/SH_33.png">
+<img id="VJ"		class="ears"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625481"       	src="ears/VM_35.png">
+<img id="VK"		class="ears"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625482"       	src="ears/VM_36.png">
+<img id="81"		class="eyes"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/CFAAJJJI4_IJBIJJI4____H__HAH____AJBIJA___HBJJJJJJJI4AAIBIJA4_AAAAAA_A_H4H4_A4IJJIB4HAAIBJJBHA_AAAA_A4HIA__4A4_H4H4____IBJJBIJB_HBJJJ.png">
+<img id="82"		class="eyes"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/CFAA____________________________________HA__H4HACQSSAAAAAQCS4QSA________AS4_QCCQAAACQCAQA4H4__Q4____________________________________.png">
+<img id="83"		class="eyes"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAA________________YDAH4HGwYbDH__HDAYDAA_H____________________4A2A__A2AH____________________4_AAYDAY4__4YbDGw4H4AYD________________.png">
+<img id="84"		class="eyes"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAA__H4________________AHDYIA_HA_HBAJBIA_H____________________4AbA__AbAH____________________4_ABIJAI4_A4_ABDY4A________________H4__.png">
+<img id="85"		class="eyes"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/CFAAbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbYAHAAAbbbbbbbbAAbbbbbbYAAH__AAYbYAHAAAbbbbbbbbAAbbbbbbYAAH__AAYbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.png">
+<img id="86"		class="eyes"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357321"      	src="eyes/ebmm_01.png">
+<img id="87"		class="eyes"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357322"      	src="eyes/ebmm_64.png">
+<img id="88"		class="eyes"       	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357323"      	src="eyes/ebmm_65.png">
+<img id="Ge"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487262" 	src="eyes/grau_31.png">
+<img id="Gf"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487263" 	src="eyes/grau_32.png">
+<img id="gG"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487278" 	src="eyes/grau_47.png">
+<img id="gH"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487279" 	src="eyes/grau_48.png">
+<img id="GM"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487244" 	src="eyes/grau_13.png">
+<img id="gm"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487310" 	src="eyes/grau_79.png">
+<img id="GN"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487245" 	src="eyes/grau_14.png">
+<img id="gn"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487311" 	src="eyes/grau_80.png">
+<img id="GO"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487246" 	src="eyes/grau_15.png">
+<img id="GP"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487247" 	src="eyes/grau_16.png">
+<img id="gW"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487294" 	src="eyes/grau_63.png">
+<img id="gX"		class="eyes"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487295" 	src="eyes/grau_64.png">
+<img id="lA"		class="eyes"       	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856395"        	src="eyes/LRV_01.png">
+<img id="lB"		class="eyes"       	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856396"        	src="eyes/LRV_02.png">
+<img id="R4"		class="eyes"       	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259716"	src="eyes/RES_07.png">
+<img id="SE"		class="eyes"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="eyes/SH_10.png">
+<img id="SF"		class="eyes"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="eyes/SH_13.png">
+<img id="SG"		class="eyes"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="eyes/SH_17.png">
+<img id="SH"		class="eyes"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="eyes/SH_19.png">
+<img id="VL"		class="eyes"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625483"       	src="eyes/VM_57.png">
+<img id="VM"		class="eyes"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625484"       	src="eyes/VM_58.png">
+<img id="F1"		class="foot"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/GFAAttttttttttttFottttFEQitttttttttttttttottttttoAElSiCQCQiUSUiUCFkiSiiSUSSUUiCQCFSUSQotttFotASSSSAtFotASSSSiiiUUSUSiUikttttttkCAttt.png">
+<img id="f1"		class="foot"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/GFAAtttASkttttttkUUSSiSUSiSUSSSSAtFotASSSSAtttttoAEgSiCQCQiUSUiUSUkiSiCSUSSUUiCQCASUSQAAotACtQSCFttttttttttttFgEQCttttQCtttttttttttt.png">
+<img id="F2"		class="foot"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAAtttttttttttttotttoAAotAFttttttttttttFottFGAgEg2AA2EgAtFotAkAAAtttttttttttttttttttttttttttttttttttttttttttttttottFAAAttFoAAotttAA.png">
+<img id="f2"		class="foot"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAAFottttAAAAoAAottttttttttttttttttttttttttttttttttttttttttttttttttttAoAkAtgEAgEg2AA2EgAtFtttgAFottttttttttAAtFoAAtttAotttttttttttt.png">
+<img id="F3"		class="foot"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/CFAA_________4A____A________H4A_______4HA_4_4H44_______44_H4__444_H4H_____A____44_H4________________________________________________.png">
+<img id="f3"		class="foot"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/CFAA__________44____________________________________H4_HH_____4H__HH4H444_4_H4_HH_______HH4H44_AH4_______H4H_______H44_HH___________.png">
+<img id="31"		class="hat"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAA____________4_4HA_______YjEH__H4_ADcjcA_H4_HDbbbEcbbkAH___H4H_______________Ab4_YbbcEHgEkbDH4Hbkc7_fA_H4__________________H_____.png">
+<img id="32"		class="hat"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/CFAAbbbbbbbbbbbbbbbbbbbbDYbbbbbbbbDYA-YDGw2AwGbAGw22w2GwGw2222YDbbA-AbbbDYA222GwGw2w22GAbbDYbA22G4AbbbbbbbDYbbbbbbbbbbbbbbbbbbbbbbbb.png">
+<img id="33"		class="hat"        	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/GFAAbbbbbbbbbbbbLfbbbbJJ5JZbbbbbbbbbbbbbDYbbbbbbbDYD__YDH4__IB4IZLPJJPJJJAIB__H4H4__H4HAbbbbbbAbbbbbbbbbbbbbbLPJJZbbLZLJbbbbbbZbbbbb.png">
+<img id="Gc"		class="hat"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487260" 	src="hat/grau_29.png">
+<img id="Gd"		class="hat"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487261" 	src="hat/grau_30.png">
+<img id="gJ"		class="hat"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487281" 	src="hat/grau_50.png">
+<img id="gS"		class="hat"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487290" 	src="hat/grau_59.png">
+<img id="gT"		class="hat"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487291" 	src="hat/grau_60.png">
+<img id="gV"		class="hat"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487293" 	src="hat/grau_62.png">
+<img id="gY"		class="hat"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487296" 	src="hat/grau_65.png">
+<img id="R5"		class="hat"        	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259717"	src="hat/RES_06.png">
+<img id="SI"		class="hat"        	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="hat/SH_23.png">
+<img id="SJ"		class="hat"        	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="hat/SH_31.png">
+<img id="SK"		class="hat"        	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="hat/SH_36.png">
+<img id="VN"		class="hat"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625485"       	src="hat/VM_03.png">
+<img id="VO"		class="hat"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625486"       	src="hat/VM_65.png">
+<img id="Ga"		class="head"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487258" 	src="head/grau_27.png">
+<img id="Gb"		class="head"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487259" 	src="head/grau_28.png">
+<img id="GK"		class="head"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487242" 	src="head/grau_11.png">
+<img id="GL"		class="head"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487243" 	src="head/grau_12.png">
+<img id="PD"		class="head"       	title="PearIyNerfect                       	CC"	data-url="https://twitter.com/PearIyNerfect/status/521850595981135875" 	src="head/PN_03.png">
+<img id="SL"		class="head"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="head/SH_02.png">
+<img id="SM"		class="head"       	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="head/SH_07.png">
+<img id="VP"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625487"       	src="head/VM_05.png">
+<img id="VQ"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625488"       	src="head/VM_07.png">
+<img id="VR"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625489"       	src="head/VM_09.png">
+<img id="VS"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625490"       	src="head/VM_13.png">
+<img id="VT"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625491"       	src="head/VM_22.png">
+<img id="VU"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625492"       	src="head/VM_24.png">
+<img id="VV"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625493"       	src="head/VM_26.png">
+<img id="VW"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625494"       	src="head/VM_59.png">
+<img id="VX"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625495"       	src="head/VM_60.png">
+<img id="VY"		class="head"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625496"       	src="head/VM_66.png">
+<img id="gA"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487272" 	src="leg/grau_41.png">
+<img id="gB"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487273" 	src="leg/grau_42.png">
+<img id="GF"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487237" 	src="leg/grau_06.png">
+<img id="GG"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487238" 	src="leg/grau_07.png">
+<img id="Gg"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487264" 	src="leg/grau_33.png">
+<img id="GH"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487239" 	src="leg/grau_08.png">
+<img id="Gh"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487265" 	src="leg/grau_34.png">
+<img id="GI"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487240" 	src="leg/grau_09.png">
+<img id="gL"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487283" 	src="leg/grau_52.png">
+<img id="Gm"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487270" 	src="leg/grau_39.png">
+<img id="gM"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487284" 	src="leg/grau_53.png">
+<img id="Gn"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487271" 	src="leg/grau_40.png">
+<img id="GQ"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487248" 	src="leg/grau_17.png">
+<img id="GR"		class="leg"        	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487249" 	src="leg/grau_18.png">
+<img id="L1"		class="leg"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357326"      	src="leg/ebmm_40.png">
+<img id="L2"		class="leg"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357327"      	src="leg/ebmm_41.png">
+<img id="L3"		class="leg"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357328"      	src="leg/ebmm_62.png">
+<img id="L4"		class="leg"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357329"      	src="leg/ebmm_63.png">
+<img id="L5"		class="leg"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357330"      	src="leg/ebmm_67.png">
+<img id="L6"		class="leg"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357331"      	src="leg/ebmm_69.png">
+<img id="L7"		class="leg"        	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357332"      	src="leg/ebmm_70.png">
+<img id="lC"		class="leg"        	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856397"        	src="leg/LRV_08.png">
+<img id="lD"		class="leg"        	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856398"        	src="leg/LRV_09.png">
+<img id="lE"		class="leg"        	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856399"        	src="leg/LRV_16.png">
+<img id="lF"		class="leg"        	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856400"        	src="leg/LRV_17.png">
+<img id="R6"		class="leg"        	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259718"	src="leg/RES_12.png">
+<img id="R7"		class="leg"        	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259719"	src="leg/RES_13.png">
+<img id="Va"		class="leg"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625498"       	src="leg/VM_46.png">
+<img id="Vb"		class="leg"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625499"       	src="leg/VM_47.png">
+<img id="Vc"		class="leg"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625500"       	src="leg/VM_48.png">
+<img id="Vd"		class="leg"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625501"       	src="leg/VM_49.png">
+<img id="Ve"		class="leg"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625502"       	src="leg/VM_50.png">
+<img id="Vf"		class="leg"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625503"       	src="leg/VM_83.png">
+<img id="Vg"		class="leg"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625504"       	src="leg/VM_84.png">
+<img id="VZ"		class="leg"        	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625497"       	src="leg/VM_45.png">
+<img id="01"		class="mouth"      	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAAttttttttttttttttttttJJJNttttttttttNoFotttttttttFaCtFoFbjEYbA_A4H4HA_AbDgcboFotQTotttttttttFoFpttttttttttpJJJtttttttttttttttttttt.png">
+<img id="02"		class="mouth"      	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAAtttttttttttttttttttttAotttttttttttNoFotttttttttFttttttttttFH-JgEgEJ34ottttttttttotttttttttFoFptttttttttttFAttttttttttttttttttttt.png">
+<img id="03"		class="mouth"      	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/CFAAbbbbbbbbbbbbbbbbbbbbbAYDYbbbbbbbbYAH4HAbbbbbbbYAAAbbbbAAAAAH_AAAAAAHAAAAAAbbbbAAAAbbbbbYAAH__AAYbbbbbbbAYDAbbbbbbbbbbbbbbbbbbbbb.png">
+<img id="04"		class="mouth"      	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357324"      	src="mouth/ebmm_66.png">
+<img id="05"		class="mouth"      	title="Ben Porter                          	CC"	data-url="https://twitter.com/eigenbom/status/521817667305357325"      	src="mouth/ebmm_68.png">
+<img id="gC"		class="mouth"      	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487274" 	src="mouth/grau_43.png">
+<img id="gD"		class="mouth"      	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487275" 	src="mouth/grau_44.png">
+<img id="lG"		class="mouth"      	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856401"        	src="mouth/LRV_12.png">
+<img id="lH"		class="mouth"      	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856402"        	src="mouth/LRV_13.png">
+<img id="R8"		class="mouth"      	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259720"	src="mouth/RES_09.png">
+<img id="SN"		class="mouth"      	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="mouth/SH_12.png">
+<img id="SO"		class="mouth"      	title="Sebastian Hagelstein ‏@SebHagelstein	CC"	data-url="https://twitter.com/SebHagelstein/status/522209533914255360/"	src="mouth/SH_18.png">
+<img id="l8"		class="noses"      	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856393"        	src="noses/LRV_03.png">
+<img id="l9"		class="noses"      	title="L Rtvri ‏@lrtvri                    	CC"	data-url="https://twitter.com/lrtvri/status/522130783075856394"        	src="noses/LRV_04.png">
+<img id="11"		class="tail"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/IFAASSSSSSSSSSSSSSSSSSSSSTSSSSSSSSSSSSSKKSSSSSSKRKRSKJSSSSJJSSJRSSSbbbTbbbbTZLSSSSSTSSSSSSSSSSSSSSSSSSabbbbabbbbSSSTSSSSSSSSSSSTbbba.png">
+<img id="12"		class="tail"       	title="yip.pe                              	CC"	data-url=""                                                            	src="yippe/MFAAbbbbbdbbbbbbtSqVbbbbbbbbbbjtdboFItbbbrsJLZbbZLktbtMhMhtbbbbbbbbZNJZbbbbbbtMhJLktlhZLbbLJhktrbbtsdrbbbbbbtJdbbLMtbrUtbbbbbbbbbbbb.png">
+<img id="ga"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487298" 	src="tail/grau_67.png">
+<img id="gb"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487299" 	src="tail/grau_68.png">
+<img id="gc"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487300" 	src="tail/grau_69.png">
+<img id="gh"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487305" 	src="tail/grau_74.png">
+<img id="gI"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487280" 	src="tail/grau_49.png">
+<img id="gi"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487306" 	src="tail/grau_75.png">
+<img id="GJ"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487241" 	src="tail/grau_10.png">
+<img id="gj"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487307" 	src="tail/grau_76.png">
+<img id="gk"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487308" 	src="tail/grau_77.png">
+<img id="gP"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487287" 	src="tail/grau_56.png">
+<img id="gQ"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487288" 	src="tail/grau_57.png">
+<img id="gR"		class="tail"       	title="Gruau Pomme Lackey ‏@mousefountain  	CC"	data-url="https://twitter.com/mousefountain/status/521908637355487289" 	src="tail/grau_58.png">
+<img id="PE"		class="tail"       	title="PearIyNerfect                       	CC"	data-url="https://twitter.com/PearIyNerfect/status/521850595981135876" 	src="tail/PN_08.png">
+<img id="PF"		class="tail"       	title="PearIyNerfect                       	CC"	data-url="https://twitter.com/PearIyNerfect/status/521850595981135877" 	src="tail/PN_10.png">
+<img id="R9"		class="tail"       	title="Ryan Emmett Simmons ‏@remmettsimmons	CC"	data-url="https://twitter.com/remmettsimmons/status/522158829686259721"	src="tail/RES_03.png">
+<img id="Vh"		class="tail"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625505"       	src="tail/VM_11.png">
+<img id="Vi"		class="tail"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625506"       	src="tail/VM_21.png">
+<img id="Vj"		class="tail"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625507"       	src="tail/VM_23.png">
+<img id="Vk"		class="tail"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625508"       	src="tail/VM_25.png">
+<img id="Vl"		class="tail"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625509"       	src="tail/VM_67.png">
+<img id="Vm"		class="tail"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625510"       	src="tail/VM_81.png">
+<img id="Vn"		class="tail"       	title="Victor-Moura-@CrownoO               	CC"	data-url="https://twitter.com/CrownoO/status/522161479995625511"       	src="tail/VM_82.png">
+
+
+</div>
+
+
+<!-- 
+
+
+
+
+
+
+
+ -->
+
+<script>
+	$(window).on("load",function(e){
+
+		"use strict";
+
+
+
+
+
+		var $img=$("img");
+		var a=[];
+		var $code = $("#frame1");
+		var $body = $("body");
+		var $pieces = $("#pieces")
+		var $pasteboard = $("#pasteboard");
+		var poffset=$pasteboard.offset();
+		var base64url="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".split("");
+		var rb64={};
+		var codebox=$("#code")[0];
+		var ids = $("img").map(function(){ return this.id});
+		var $selectedFrame = $("#frame1")
+		console.log("ids",ids);
+		base64url.forEach(function(o,i){
+			rb64[o]=i;
+		});
+
+
+		function resetImgs (butnot) {
+			butnot=butnot||{};
+
+			$img.each(function(i){
+				if(!(this.id in butnot)) {
+					$(this).removeClass("active").css({"position":"absolute","display":"block"}).css(a[i]);
+				}
+			})
+
+			
+		}
+
+		function resetImg (not) {
+		
+
+			$("img").not(not).each(function(i){
+				if(!(this.id in butnot)) {
+					$(this).removeClass("active").css({"position":"absolute","display":"block"}).css(a[i]);
+				}
+			})
+
+			
+		}
+
+		// "monster code" is a string, a straight list of 4 base64 digit codes, IDxy
+		// frame is a parsed array of {id, x, y} with x and y (center oriented) being between 0 and 63
+		// screepn positions is array of {id, left, top, width, height} , with values being 4x the x,y coordinates
+		// frames is an array of frames, ordered by time, each frame representing a frame.
+		// 
+		function codonToObject (codon) {
+            return {
+                id: codon.substr(0, 2),
+                x: rb64[codon.substr(2, 1)] || 0,
+                y: rb64[codon.substr(3, 1)] || 0
+            };
+        }
+		function idExists(id) {
+			if(id) {
+				console.log(id, id.substr, ids.indexOf, ids);
+				return _.indexOf(ids, id.substr(0,2))>=0;
+			}
+		}
+		function splitStringBy4(string) {
+			return (string.replace(/[^A-Za-z0-9\-_]/g, "") .match(/.{1,4}/g) || [])
+		}
+		function rotate2dArray(arr) {
+			return _.zip.apply(_, arr);
+		}
+		function codeToFrames(code) {
+			// add groupBy clause
+	        return rotate2dArray(
+	        	_.chain(splitStringBy4(code))
+		        .filter(idExists)
+		        .map(codonToObject)
+		        .groupBy("id")
+		        .value()
+	        );
+
+		}
+		function codeToFrame(code) {
+	        return splitStringBy4(code)
+	        .filter(idExists)
+	        .map(codonToObject);
+		}
+
+		function applyFrameToScreen (frame) {
+			//non animated version.
+		}
+		function playAnimation (frames) {
+
+		}
+		function applyFrameToScreen (frame) {
+			// with animation
+			// 
+			var affectedimgs=[];
+			var fcount=1;
+
+			frame.forEach(function (o,i) {
+	            var $img = $("#" + o.id);
+	            if(o.id in affectedimgs){
+	            	affectedimgs[o.id]+=1;
+	            	fcount=affectedimgs[o.id];
+	            } else {
+	            	affectedimgs[o.id]=1;
+	            	
+	            }
+	            var w = $img.width();
+	            var h = $img.height();
+	            $pieces.append($img);
+
+
+	            setTimeout(function(){
+		            $img.addClass("active").css({
+		                left: (o.x * 4) - w / 2,
+		                top: (o.y * 4) - h / 2
+		            });
+	            	
+	            },200*fcount);
+	        });
+			resetImgs(affectedimgs);
+		}
+		function frameToCode(frame) {
+			return (frame.map(function(o){return [o.id, base64url[o.x] + base64url[o.y]].join("")}).join("")+"________________________________").substr(0,32);
+		}
+		function activatePiece (piece) {
+			$("#"+piece.id).addClass("active");
+		}
+		function getScreenPositions($imgs) {
+			return $.map($imgs||$("img"),function(img){
+				var o = $(img).offset();
+				var w = $(img).width();
+				var h = $(img).height();
+				return {id:$(img)[0].id,left:o.left,top:o.top,width:w,height:h};
+			});
+		}
+		function getFrameFromSp(sp) {
+		    return sp.map(function (o) {
+		        return {
+		            id: o.id,
+		            x: Math.floor((o.left + o.width / 2)/4),
+		            y: Math.floor((o.top + o.height / 2)/4)
+		        }
+		    }).filter(function (o) {
+		        return o.x < 64 && o.y < 64 && o.x >= 0 && o.y >= 0;
+		    });
+		}
+		a=getScreenPositions();
+		resetImgs();
+		$pieces.removeClass("loading");
+
+
+		$("img").draggable({
+			grid:[4,4],
+			start:function(e){
+				$pieces.append(this);
+				$(this).addClass("transitionoff");
+			},
+			stop: function(e){
+				// on drop, get all the screen positions
+				var sp=getScreenPositions();
+				//make all images inactive
+				$("img").removeClass("active");
+				//reactivate transitions
+				$(this).removeClass("transitionoff");
+				//get the positions of images from the box
+				var frame = getFrameFromSp(sp);
+				//ensure the frame has only 8 peices
+				frame.length=frame.length<8?frame.length:8;
+				//get a string of code from those positions
+				var codeString = frameToCode(frame);
+				//activate the imgs that are in the frame
+				// applyFrameToScreen(frame);
+				frame.forEach(activatePiece);
+				console.log(frame);
+				applyFrameToScreen(frame);
+				//put the code into the code box
+				$code.val(codeString);
+				$selectedFrame.val(codeString);
+				//also put the code in the hash string.
+				location.hash=$code.val();
+			}
+		});
+		//L1jrB6hdH1hK82iOE2Vfe2vf
+		function ontext() {
+		    setTimeout((function () {
+		        var result = $code.val();
+		        var frame = codeToFrame(result);
+		        location.hash=result;
+		        console.log(frame);
+		        applyFrameToScreen(frame);
+		    }).bind(this), 0);
+		};
+		$code.val(location.hash).on("keyup keydown keypress change click touchstart mousedown mouseup",_.debounce(ontext,100));
+		ontext();
+		
+
+		$body.addClass("loaded");
+		$pasteboard.html("");
+
+
+
+
+
+
+
+	})
+</script>
+</body>
+</html>
