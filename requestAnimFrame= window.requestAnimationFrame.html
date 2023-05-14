@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+canvas  {
+    border: 1px solid black;
+}
+
+#shortcode {
+    border: 1px solid black;
+    
+}
+    </style>
+    <script src="gif.js"> </script>
+</head>
+<body>
+    <canvas width="64" height="64"></canvas>
+    <img id="gif" src="" alt="">
+<pre id="shortcode"></pre>
+
+
+    <script>
+
+
+
+    requestAnimFrame= window.requestAnimationFrame || 
+    window.webkitRequestAnimationFrame || 
+    window.mozRequestAnimationFrame || 
+    window.oRequestAnimationFrame || 
+    window.msRequestAnimationFrame ||
+    function( /* function */ callback, /* DOMElement */ element) {
+            window.setTimeout(callback, 1000 / 60);
+    };
+
+
+function define(a, b, c) {
+
+    var  id, dependencies, factory, idIsString = typeof a == "string",
+        //chop arglist if id is a string
+        arg= [].slice.call(arguments, +idIsString), 
+        fileModRegex = /([A-Z0-9~!$-.:;=?\[\]_]+)\.js$/i,
+        scripts = document.getElementsByTagName("script"),
+        d = define;
+
+    //if first arg is string, assign to id, else id is filename
+    id = idIsString? a : fileModRegex.exec(scripts[scripts.length - 1].src)[1];
+    //take last arg as factory regardless
+    factory = arg[arg.length - 1];
+    //if we still have two arguments, the first one is dependencies, else it's empty array
+    arg.length === 2 && (dependencies = arg[0] || []);
+    //add module and its dependencies to the collection.
+    (d.modules = d.modules || {})[id] = factory;
+    (d.dependencies = d.dependencies || {})[id] = dependencies;
+
+}
+
+function require(a,b) {
+    "use strict";
+    //a is array
+    //b is a function.
+    //
+    //I need to get the stuff off define.modules and pass it into b, to call it.
+    //
+    
+    b.apply(null, a.map(function (dep) { return define.modules[dep]; }));
+
+}
+
+
+
+
+// a simple functional playhead constructor.
+
+define("playhead", [], function() {
+
+    function getTime() {
+        return (new Date()).getTime();
+    }
+    return function Playhead() {
+        var startTime = 0;
+        var stopTime = 0;
+        var started = false;
+        this.start = function() {
+            started = true;
+            startTime = getTime() - stopTime;
+            return this;
+        };
+        this.stop = function() {
+            if (started) {
+                started = false;
+                stopTime = getTime() - startTime;
+            }
+            return this;
+        };
+        this.reset = function() {
+            if (!started) {
+                startTime = 0;
+                stopTime = 0;
+            }
+            return this;
+        };
+        this.set = function(x) {
+            if (!isNaN(x) && x >= 0) {
+                if (started) {
+                    startTime = getTime() - x;
+                } else {
+                    stopTime = x;
+                }
+            }
+            return this;
+        };
+        this.time = function() {
+            if (started) {
+                return getTime() - startTime;
+            } else {
+                return stopTime;
+            }
+        };
+    };
+});
+
+var PlayHead
+require(["playhead"],function(ph){
+    console.log("test",ph);
+    PlayHead=ph();
+    
+    
+});
+
+
+
+
+
+
+    var base64url="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".split("");
+    var rb64={};
+
+    base64url.forEach(function(o,i){
+        rb64[o]=i;
+    });
+
+
+    function groupById (obj){
+
+    }
+
+
+    // "monster code" is a string, a straight list of 4 base64 digit codes, IDxy
+    // frame is a parsed array of {id, x, y} with x and y (center oriented) being between 0 and 63
+    // screepn positions is array of {id, left, top, width, height} , with values being 4x the x,y coordinates
+    // frames is an array of frames, ordered by time, each frame representing a frame.
+    // 
+    function codonToObject (codon,z) {
+        var  x=rb64[codon.substr(2, 1)] || 0, y=rb64[codon.substr(3, 1)] || 0;
+        return {
+            id: codon.substr(0, 2),
+            x: x-31,
+            y: y-31,
+            visible: x!==63||y!==63,
+            z:z 
+        };
+    }
+    function codeClone(obj){
+        return {
+            id: obj.id,
+            x: obj.x,
+            y: obj.y,
+            visible: obj.visibility,
+            z: obj.z
+        }
+    }
+    function idExists(id) {
+
+        return id.length>=2;
+    }
+    function splitStringBy4(string) {
+        return (string.replace(/[^A-Za-z0-9\-_]/g, "") .match(/.{1,4}/g) || [])
+    }
+
+
+    function codeToFrames(code) {
+        // add groupBy clause
+        var frame = codeToFrame(code);
+        var frames = [{}];
+        var i,f;
+        for(i=0,f=0;i<frame.length;i+=1){
+            if(frame[i].id in frames[f]){
+                f+=1;
+                frames[f]={};
+            }
+            frames[f][frame[i].id]=frame[i];
+        }
+
+
+
+        return frames;
+
+    }
+    function codeToFrame(code) {
+        return splitStringBy4(code)
+        .filter(idExists)
+        .map(codonToObject);
+    }
+    function easeInOutBack (t, b, c, d, s) {
+            if (s == undefined) s = 1.70158; 
+            if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
+            return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
+    }
+    function framesToFrame(frames,t) {
+        // todo: add loop frame to tween back to start.
+        var fa = {};
+        var fb = {};
+        var ft = {};
+        var i,j;
+        if(t<0){t=0};
+        
+        var ta=Math.floor(t)%frames.length;
+        var tb=ta+1;
+        if(tb>=frames.length){tb=0}
+        var tl=t-Math.floor(t);
+        tl = easeInOutBack(tl,0,1,1);
+        var tli=1-tl;
+        // create initial conditions by working backward.
+        for (i=frames.length-1;i>=0;i--){
+            for(j in frames[i]){
+                fa[j]=fb[j]=codeClone(frames[i][j]);
+                if(i>0){
+                    fa[j].visible=fb[j].visible=false;
+                }
+            }
+        }
+        // create before/after frames by working forward
+        for (i=0;i<frames.length;i+=1){
+            if(i<=ta){
+                for(j in frames[i]){
+                    fa[j]=frames[i][j];
+                }
+            }
+            if(i<=tb){
+                for(j in frames[i]){
+                    fb[j]=frames[i][j];
+                }
+            }
+        }
+        // make tweened frame
+        for(j in fa) {
+            ft[j]={};
+            (ft[j].x)=fa[j].x*tli;
+            (ft[j].y)=fa[j].y*tli;
+            (ft[j].x)+=fb[j].x*tl;
+            (ft[j].y)+=fb[j].y*tl;
+            ft[j].visible=fa[j].visible;
+            ft[j].z=fa[j].z;
+            if(!fb[j].visible){
+                ft[j].x=fa[j].x;
+                ft[j].y=fa[j].y;
+            }
+            if(!fa[j].visible){
+                ft[j].x=fa[j].x;
+                ft[j].y=fa[j].y;
+                ft[j].visible=false;
+            }
+
+
+
+        }
+
+        return ft;
+    }
+
+
+    fs=codeToFrames("__aaF2U2BIhsBJcjA3Off2t4a3tgA8Sna5ws__aNa3sfA3OcA8SkF2U5f2n3a5wrf2m5F2Y5a5wpa3reA3OfA8UhBIhsF2W3f2q3a5wsa3rgBJdkA3PgA8UmF2T3BIgqa3rea5vqf2p4BJdhA3PdA8Toa5vqf2r2BIgtBJeja3sfA3QhA8WnF2U4");
+
+
+var $=document.querySelector.bind(document);
+var ctx = $("canvas").getContext("2d");
+$("#shortcode").textContent = (JSON.stringify(fs,null,"  "));
+
+var ph = new PlayHead();
+ph.start();
+
+var gif = new GIF({
+  workers: 2,
+  quality: 10
+});
+var frm;
+for(t=0;t<fs.length*10+10;t++){
+    frm = framesToFrame(fs,t/10);
+    ctx.clearRect(0,0,64,64);
+    for(i in frm) {
+
+        if(frm[i].visible){
+            if(!frm.__) {
+                ctx.fillText(i,frm[i].x+31,frm[i].y+31);
+            } else {
+                ctx.fillText(i,Math.round(frm[i].x+31+frm.__.x),Math.round(frm[i].y+31+frm.__.y));
+            }
+        }
+    }
+    gif.addFrame(ctx, {copy: true});   
+}
+gif.on('finished', function(blob) {
+  document.getElementById("gif").src=URL.createObjectURL(blob);
+});
+
+gif.render();
+
+setTimeout(function draw (){
+    var t= ph.time();
+    var frm = framesToFrame(fs,t/200);
+    var i = 0;
+    ctx.clearRect(0,0,256,256);
+    //ctx.fillRect(/1000,10,10,10);
+    for(i in frm) {
+        //console.log(i,frm[i]);
+        
+        if(frm[i].visible){
+            if(!frm.__) {
+                ctx.fillText(i,frm[i].x+31,frm[i].y+31);
+            } else {
+                ctx.fillText(i,Math.round(frm[i].x+31+frm.__.x),Math.round(frm[i].y+31+frm.__.y));
+            }
+        }
+    }
+    setTimeout(draw,100);
+},10)
+
+    </script>
+</body>
+</html>

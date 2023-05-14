@@ -1,0 +1,45 @@
+
+
+- finalise url format  almost
+- MetaChars [partslibrary][outputsize][reserved][reserved]
+- add __ tile to signify "empty"
+- add __ (63,63) coordinates to signify (invisible)
+- figure out how to encode a part disappearing.  p
+- figure out how splitting into an animation works.  p
+- splitting into an animation uses fixed size codes for each frame p
+- 5/6 text fields, 1 for each frame, 1 for completed share URL. one for metadata.
+- 8 parts for each frame x
+- todo: add frame buttons.  p
+- todo: add play button.  
+- todo: svg export.
+- todo: gif export/canvg. 
+- todo: add an undo function. 
+- todo: make mm.pix.pe  x
+
+
+F2U2BIhsBJcjA3Off2t4a3tgA8Sna5ws
+BIhsBJcja3sfA3OcA8SkF2U5f2n3a5wr
+BIhsBJcjf2m5F2Y5a5wpa3reA3OfA8Uh
+BIhsF2W3f2q3a5wsa3rgBJdkA3PgA8Um
+F2T3BIgqa3rea5vqf2p4BJdhA3PdA8To
+a5vqf2r2BIgtBJeja3sfA3QhA8WnF2U4
+F2U2BIhsBJcjA3Off2t4a3tgA8Sna5ws
+
+BIhsBJcja3sfA3OcA8SkF2U5f2n3a5wr
+BIhsBJcjf2m5F2Y5a5wpa3reA3OfA8Uh
+BIhsF2W3f2q3a5wsa3rgBJdkA3PgA8Um
+F2T3BIgqa3rea5vqf2p4BJdhA3PdA8To
+a5vqf2r2BIgtBJeja3sfA3QhA8WnF2U4
+
+F2U2BIhsBJcjA3Off2t4a3tgA8Sna5ws
+BIhsBJcja3sfA3OcA8SkF2U5f2n3a5wr
+BIhsBJcjf2m5F2Y5a5wpa3reA3OfA8Uh
+BIhsF2W3f2q3a5wsa3rgBJdkA3PgA8Um
+F2T3BIgqa3rea5vqf2p4BJdhA3PdA8To
+a5vqf2r2BIgtBJeja3sfA3QhA8WnF2U4
+
+F2U2BIhsBJcjA3Off2t4a3tgA8Sna5ws
+BIhsBJcja3sfA3OcA8SkF2U5f2n3a5wr
+BIhsBJcjf2m5F2Y5a5wpa3reA3OfA8Uh
+BIhsF2W3f2q3a5wsa3rgBJdkA3PgA8Um
+F2T3BIgqa3rea5vqf2p4BJdhA3PdA8To#a5vqf2r2BIgtBJeja3sfA3QhA8WnF2U4#F2U2BIhsBJcjA3Off2t4a3tgA8Sna5ws#BIhsBJcja3sfA3OcA8SkF2U5f2n3a5wr#BIhsBJcjf2m5F2Y5a5wpa3reA3OfA8Uh#BIhsF2W3f2q3a5wsa3rgBJdkA3PgA8Um#F2T3BIgqa3rea5vqf2p4BJdhA3PdA8To#a5vqf2r2BIgtBJeja3sfA3QhA8WnF2U4

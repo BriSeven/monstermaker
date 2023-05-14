@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <style>
+  canvas {
+    border: 1px solid black;
+  }
+
+  body {
+      background-color: lightblue;
+  }
+</style>
+</head>
+<body>
+  <canvas id="sine" width="256" height="256"></canvas>
+  <script>
+  var $canvas=document.getElementById("sine");
+  var ctx= $canvas.getContext("2d");
+  var startTime=Date.now();
+
+
+  ctx.fillRect(10,10,10,10);
+
+
+  function drawSine(ctx,phase,amplitude,wavelength,offset) {
+      var samples=16;
+      var width=256;
+      var i,x,y,t;
+      var localoffset=128;
+      var localamplitude=64;
+      for(i=0;i<samples;i++){
+          x=(i/samples)*width;
+          t=i/samples;
+          y=amplitude*Math.sin( -phase + t*Math.PI*(1/wavelength) ) -offset ;
+          y=y*localamplitude+localoffset;
+          ctx.fillRect(x,y,5,5);
+          
+      }
+      
+  }
+
+
+  requestAnimationFrame(function draw (){
+      var time=Date.now()-startTime;
+      ctx.clearRect(0,0,256,256);
+      drawSine(ctx,time/1000*Math.PI*2,0.25,0.25,-0.9);
+
+      
+      requestAnimationFrame(draw);
+  });
+  </script>
+</body>
+</html>
